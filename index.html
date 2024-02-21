@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Sinh viên</title>
+<style>
+    /* CSS cho trang web */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+</head>
+<body>
+    <h2>Quản lý Sinh viên</h2>
+    <form id="studentForm">
+        <input type="hidden" id="studentIndex">
+        <label for="studentID">Mã SV:</label>
+        <input type="text" id="studentID" required>
+        <label for="fullName">Họ và Tên:</label>
+        <input type="text" id="fullName" required>
+        <label for="dob">Ngày sinh:</label>
+        <input type="date" id="dob" required>
+        <label for="class">Lớp học:</label>
+        <input type="text" id="class" required>
+        <label for="gpa">Điểm GPA:</label>
+        <input type="number" id="gpa" step="0.01" min="0" max="4" required>
+        <button type="button" id="submitBtn" onclick="addOrUpdateStudent()">Thêm Sinh viên</button>
+        <button type="button" id="cancelBtn" style="display: none;" onclick="cancelUpdate()">Hủy</button>
+    </form>
+    <br>
+    <h2>Danh sách Sinh viên</h2>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Mã SV</th>
+                <th>Họ và Tên</th>
+                <th>Ngày sinh</th>
+                <th>Lớp học</th>
+                <th>Điểm GPA</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Thông tin sinh viên sẽ được thêm vào đây -->
+        </tbody>
+    </table>
+
+    <script>
+        // Đối tượng Sinh viên
+        class Student {
+            constructor(id, fullName, dob, className, gpa) {
+                this.id = id;
+                this.fullName = fullName;
+                this.dob = dob;
+                this.className = className;
+                this.gpa = gpa;
+            }
+        }
+
+        // Mảng để lưu danh sách sinh viên
+        let students = [];
+
+        // Hàm để thêm hoặc cập nhật thông tin sinh viên
+        function addOrUpdateStudent() {
+            const index = document.getElementById("studentIndex").value;
+            const id = document.getElementById("studentID").value;
+            const fullName = document.getElementById("fullName").value;
+            const dob = document.getElementById("dob").value;
+            const className = document.getElementById("class").value;
+            const gpa = parseFloat(document.getElementById("gpa").value);
+
+            if (index === "") {
+                // Thêm sinh viên mới
+                const student = new Student(id, fullName, dob, className, gpa);
+                students.push(student);
+            } else {
+                // Cập nhật thông tin sinh viên
+                students[index].id = id;
+                students[index].fullName = fullName;
+                students[index].dob = dob;
+                students[index].className = className;
+                students[index].gpa = gpa;
+                document.getElementById("submitBtn").innerText = "Thêm Sinh viên";
+                document.getElementById("cancelBtn").style.display = "none";
+            }
+
+            displayStudents();
+            document.getElementById("studentForm").reset();
+        }
+
+        // Hàm để hiển thị danh sách sinh viên
+        function displayStudents() {
+            const tableBody = document.querySelector("#studentTable tbody");
+            tableBody.innerHTML = "";
+
+            students.forEach((student, index) => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.fullName}</td>
+                    <td>${student.dob}</td>
+                    <td>${student.className}</td>
+                    <td>${student.gpa}</td>
+                    <td><button onclick="editStudent(${index})">Sửa</button></td>
+                `;
+            });
+        }
+
+        // Hàm để chỉnh sửa thông tin sinh viên
+        function editStudent(index) {
+            const student = students[index];
+            document.getElementById("studentIndex").value = index;
+            document.getElementById("studentID").value = student.id;
+            document.getElementById("fullName").value = student.fullName;
+            document.getElementById("dob").value = student.dob;
+            document.getElementById("class").value = student.className;
+            document.getElementById("gpa").value = student.gpa;
+            document.getElementById("submitBtn").innerText = "Cập nhật";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+        }
+
+        // Hàm để hủy bỏ việc cập nhật sinh viên
+        function cancelUpdate() {
+            document.getElementById("studentForm").reset();
+            document.getElementById("submitBtn").innerText = "Thêm Sinh viên";
+            document.getElementById("cancelBtn").style.display = "none";
+            document.getElementById("studentIndex").value = "";
+        }
+    </script>
+</body>
+</html>
